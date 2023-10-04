@@ -1,0 +1,36 @@
+# Copyright 2023 Adevinta
+
+name: Lava
+description: Run Lava
+inputs:
+  version:
+    description: Lava version
+    default: latest
+  config:
+    description: Path of the Lava configuration file
+    default: lava.yaml
+outputs:
+  status:
+    description: Status code
+    value: ${{ steps.lava.outputs.status }}
+  report:
+    description: Path of the Lava report
+    value: ${{ steps.lava.outputs.report }}
+runs:
+  using: composite
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+    - name: Install Lava
+      run: 'go install "github.com/adevinta/lava/cmd/lava@${{ inputs.version }}"'
+      shell: bash
+    - name: Run Lava
+      id: lava
+      run: '"${GITHUB_ACTION_PATH}/run.bash"'
+      shell: bash
+      env:
+        LAVA_CONFIG: ${{ inputs.config }}
