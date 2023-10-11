@@ -1,0 +1,8 @@
+lava: v1.0.0
+checktypesURLs:
+  - checktypes.json
+targets:
+  - identifier: ..
+    assetType: GitRepository
+report:
+  severity: high
