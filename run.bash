@@ -18,4 +18,6 @@ status=$?
 echo "status=${status}" >> "${GITHUB_OUTPUT}"
 echo "report=${output}" >> "${GITHUB_OUTPUT}"
 
+cat "${output}"
+echo "exit status ${status}"
 exit $status
