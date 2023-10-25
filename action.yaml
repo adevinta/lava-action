@@ -4,11 +4,14 @@ name: Lava
 description: Run Lava
 inputs:
   version:
-    description: Lava version
+    description: Lava version.
     default: latest
   config:
-    description: Path of the Lava configuration file
+    description: Path of the Lava configuration file.
     default: lava.yaml
+  forcecolor:
+    description: Force colorized output.
+    default: true
 outputs:
   status:
     description: Status code
@@ -34,3 +37,4 @@ runs:
       shell: bash
       env:
         LAVA_CONFIG: ${{ inputs.config }}
+        LAVA_FORCECOLOR: ${{ inputs.forcecolor }}
