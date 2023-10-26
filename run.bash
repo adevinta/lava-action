@@ -10,9 +10,14 @@ if [[ -z $LAVA_CONFIG ]]; then
 	exit 2
 fi
 
+if [[ -z $LAVA_FORCECOLOR ]]; then
+	echo 'error: missing env var LAVA_FORCECOLOR' >&2
+	exit 2
+fi
+
 output=$(mktemp)
 
-lava run -c "${LAVA_CONFIG}" > "${output}"
+lava run -forcecolor="${LAVA_FORCECOLOR}" -c "${LAVA_CONFIG}" > "${output}"
 status=$?
 
 echo "status=${status}" >> "${GITHUB_OUTPUT}"
