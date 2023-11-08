@@ -17,7 +17,7 @@ fi
 
 output=$(mktemp)
 
-lava run -forcecolor="${LAVA_FORCECOLOR}" -c "${LAVA_CONFIG}" > "${output}"
+lava scan -forcecolor="${LAVA_FORCECOLOR}" -c "${LAVA_CONFIG}" > "${output}"
 status=$?
 
 echo "status=${status}" >> "${GITHUB_OUTPUT}"
