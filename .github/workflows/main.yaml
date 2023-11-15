@@ -4,10 +4,10 @@ name: Main
 on: [push, pull_request]
 permissions:
   contents: read
-env:
-  WANT_STATUS: 103 # ExitCodeHigh
 jobs:
   test:
+    env:
+      WANT_STATUS: 103 # ExitCodeHigh
     name: Test
     runs-on: ubuntu-latest
     steps:
@@ -28,4 +28,25 @@ jobs:
         if: ${{ steps.lava.outputs.status != env.WANT_STATUS }}
         run: |
           echo "::error::unexpected status code: got: ${{ steps.lava.outputs.status }}, want: ${{ env.WANT_STATUS }}"
+          exit 1
+  test-defaults:
+    env:
+      WANT_MIN_STATUS: 103 # ExitCodeHigh
+    name: Test Defaults
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Run Lava Action
+        id: lava
+        uses: ./
+        continue-on-error: true
+      - name: Print status
+        run: 'echo "Lava status: ${{ steps.lava.outputs.status }}"'
+      - name: Print report
+        run: 'cat "${{ steps.lava.outputs.report }}"'
+      - name: Report unexpected status
+        if: ${{ steps.lava.outputs.status < env.WANT_MIN_STATUS }}
+        run: |
+          echo "::error::unexpected status code: got: ${{ steps.lava.outputs.status }}, want: >= ${{ env.WANT_MIN_STATUS }}"
           exit 1

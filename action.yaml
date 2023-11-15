@@ -3,12 +3,11 @@
 name: Lava
 description: Run Lava
 inputs:
+  config:
+    description: Path of the Lava configuration file.
   version:
     description: Lava version.
     default: latest
-  config:
-    description: Path of the Lava configuration file.
-    default: lava.yaml
   forcecolor:
     description: Force colorized output.
     default: true
