@@ -19,12 +19,7 @@ fi
 
 # Run Lava.
 
-config=$LAVA_CONFIG
-if [[ -z $config ]]; then
-	config=$(mktemp -p .)
-	cp "${GITHUB_ACTION_PATH}/default.yaml" "${config}"
-fi
-
+config=${LAVA_CONFIG:-"${GITHUB_ACTION_PATH}/default.yaml"}
 output=$(mktemp)
 
 lava scan -forcecolor="${LAVA_FORCECOLOR}" -c "${config}" > "${output}"
