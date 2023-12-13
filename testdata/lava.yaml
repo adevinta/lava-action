@@ -1,8 +1,8 @@
 lava: v1.0.0
-checktypesURLs:
+checktypes:
   - testdata/checktypes.json
 targets:
   - identifier: .
-    assetType: GitRepository
+    type: GitRepository
 report:
   severity: high
