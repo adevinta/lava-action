@@ -2,8 +2,8 @@
 
 This action runs [Lava][lava] in your GitHub Actions workflows.
 
-[Lava][lava] is an open source vulnerability scanner that makes it
-easy to run security checks in your local and CI/CD environments.
+Lava is an open source vulnerability scanner that makes it easy to run
+security checks in your local and CI/CD environments.
 
 ## Usage
 
