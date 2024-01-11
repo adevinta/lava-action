@@ -25,13 +25,11 @@ runs:
       uses: actions/setup-go@v4
       with:
         go-version: '1.21'
-    - name: Install Lava
-      run: 'go install "github.com/adevinta/lava/cmd/lava@${{ inputs.version }}"'
-      shell: bash
     - name: Run Lava
       id: lava
       run: '"${GITHUB_ACTION_PATH}/run.bash"'
       shell: bash
       env:
+        LAVA_VERSION: ${{ inputs.version }}
         LAVA_CONFIG: ${{ inputs.config }}
         LAVA_FORCECOLOR: ${{ inputs.forcecolor }}
