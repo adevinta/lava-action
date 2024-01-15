@@ -1,4 +1,4 @@
-lava: v1.0.0
+lava: v0.0.0
 checktypes:
   - testdata/checktypes.json
 targets:
