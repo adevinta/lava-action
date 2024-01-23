@@ -1,0 +1,34 @@
+# Copyright 2024 Adevinta
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
+
+permissions:
+  contents: write
+
+# Allow only one concurrent deployment, skipping runs queued between
+# the run in-progress and latest queued. However, do not cancel
+# in-progress runs as we want to allow these production deployments to
+# complete.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+      - name: Release
+        run: go run release.go
+        env:
+          GH_TOKEN: ${{ github.token }}
