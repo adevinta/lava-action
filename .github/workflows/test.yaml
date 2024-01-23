@@ -1,6 +1,6 @@
 # Copyright 2023 Adevinta
 
-name: Main
+name: Test
 on: [push, pull_request]
 permissions:
   contents: read
