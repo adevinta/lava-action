@@ -63,11 +63,14 @@ func main() {
 		log.Fatalf("error: get hash: %v", err)
 	}
 
+	var releases []string
+
 	// Do not create vMAJOR and vMAJOR.MINOR for pre-releases.
-	releases := []string{refName}
 	if semver.Prerelease(refName) == "" {
-		releases = append(releases, semver.Major(refName), semver.MajorMinor(refName))
+		releases = []string{semver.Major(refName), semver.MajorMinor(refName)}
 	}
+
+	releases = append(releases, refName)
 
 	for _, r := range releases {
 		// Do not update vMAJOR.MINOR.PATCH.
