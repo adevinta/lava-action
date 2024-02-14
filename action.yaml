@@ -21,10 +21,6 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.21'
     - name: Run Lava
       id: lava
       run: '"${GITHUB_ACTION_PATH}/run.bash"'
