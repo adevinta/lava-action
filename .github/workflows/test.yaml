@@ -31,7 +31,8 @@ jobs:
           exit 1
   test-defaults:
     env:
-      WANT_MIN_STATUS: 103 # ExitCodeHigh
+      WANT_MIN_STATUS: 100 # ExitCodeInfo
+      WANT_MAX_STATUS: 104 # ExitCodeCritical
     name: Test defaults
     runs-on: ubuntu-latest
     steps:
@@ -46,9 +47,9 @@ jobs:
       - name: Print report
         run: 'cat "${{ steps.lava.outputs.report }}"'
       - name: Report unexpected status
-        if: ${{ steps.lava.outputs.status < env.WANT_MIN_STATUS }}
+        if: ${{ steps.lava.outputs.status < env.WANT_MIN_STATUS || steps.lava.outputs.status > env.WANT_MAX_STATUS }}
         run: |
-          echo "::error::unexpected status code: got: ${{ steps.lava.outputs.status }}, want: >= ${{ env.WANT_MIN_STATUS }}"
+          echo "::error::unexpected status code: got: ${{ steps.lava.outputs.status }}, want: [${{ env.WANT_MIN_STATUS }}, ${{ env.WANT_MAX_STATUS }}]"
           exit 1
   test-release:
     env:
@@ -82,6 +83,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
       - name: Run Lava Action
         id: lava
         uses: ./
