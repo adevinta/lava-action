@@ -23,7 +23,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Run Lava Action
-        uses: adevinta/lava-action@main
+        uses: adevinta/lava-action@v0
 ```
 
 ## Settings
@@ -34,7 +34,7 @@ The `version` input parameter specifies the version of Lava to use.
 
 ```yaml
 - name: Run Lava Action
-  uses: adevinta/lava-action@main
+  uses: adevinta/lava-action@v0
   with:
     version: latest
 ```
@@ -47,7 +47,7 @@ The path is relative to the root of the repository.
 
 ```yaml
 - name: Run Lava Action
-  uses: adevinta/lava-action@main
+  uses: adevinta/lava-action@v0
   with:
     config: lava.yaml
 ```

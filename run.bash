@@ -13,12 +13,8 @@ install_lava() {
 		url=$(printf "${GH_DOWNLOAD_URL_FMT}" "${version}")
 	fi
 
-	# Make sure the install directory exists.
-	install_dir="$(go env GOPATH)/bin"
-	mkdir -p "${install_dir}"
-
 	# Try to download a Lava release from GitHub.
-	if (curl -LsSf "${url}" | tar -xz -C "${install_dir}" lava) 2> /dev/null; then
+	if (curl -LsSf "${url}" | sudo tar -xz -C "/usr/local/bin" lava) 2> /dev/null; then
 		return 0
 	fi
 
