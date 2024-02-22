@@ -56,7 +56,7 @@ fi
 config=${LAVA_CONFIG:-"${GITHUB_ACTION_PATH}/default.yaml"}
 output=$(mktemp)
 
-lava scan -forcecolor="${LAVA_FORCECOLOR}" -c "${config}" > "${output}"
+lava scan -c "${config}" > "${output}"
 status=$?
 
 echo "status=${status}" >> "${GITHUB_OUTPUT}"
