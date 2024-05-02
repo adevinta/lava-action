@@ -44,6 +44,18 @@ if [[ -z $LAVA_FORCECOLOR ]]; then
 	exit 2
 fi
 
+if [[ -n $TEST_WORKDIR ]]; then
+	cd "$TEST_WORKDIR" || { echo 'error: could not cd to TEST_WORKDIR' >&2 ; exit 2; }
+fi
+
+if [[ -n $LAVA_CONFIG ]]; then
+	config=$LAVA_CONFIG
+elif [[ -f lava.yaml ]]; then
+	config=lava.yaml
+else
+	config="${GITHUB_ACTION_PATH}/default.yaml"
+fi
+
 # Install Lava.
 
 if ! install_lava "${LAVA_VERSION}"; then
@@ -53,14 +65,16 @@ fi
 
 # Run Lava.
 
-config=${LAVA_CONFIG:-"${GITHUB_ACTION_PATH}/default.yaml"}
 output=$(mktemp)
 
 lava scan -c "${config}" > "${output}"
 status=$?
 
-echo "status=${status}" >> "${GITHUB_OUTPUT}"
-echo "report=${output}" >> "${GITHUB_OUTPUT}"
+{
+echo "status=${status}"
+echo "report=${output}"
+echo "config=${config}"
+} > "${GITHUB_OUTPUT}"
 
 cat "${output}"
 echo "exit status ${status}"

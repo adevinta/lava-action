@@ -1,8 +1,8 @@
 lava: v0.0.0
 checktypes:
-  - testdata/checktypes.json
+  - ${GITHUB_WORKSPACE}/testdata/checktypes.json
 targets:
-  - identifier: .
+  - identifier: ${GITHUB_WORKSPACE}
     type: GitRepository
 report:
   severity: high

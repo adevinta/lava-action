@@ -52,6 +52,14 @@ The path is relative to the root of the repository.
     config: lava.yaml
 ```
 
+If the parameter is missing the action will use an existing `lava.yaml` file,
+or the [default.yaml] otherwhise.
+
+```yaml
+- name: Run Lava Action
+  uses: adevinta/lava-action@v0
+```
+
 ## Contributing
 
 **This project is in an early stage, we are not accepting external
@@ -63,3 +71,4 @@ guidelines][contributing].
 
 [lava]: https://github.com/adevinta/lava
 [contributing]: /CONTRIBUTING.md
+[default.yaml]: /default.yaml

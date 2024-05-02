@@ -5,10 +5,11 @@ on: [push, pull_request]
 permissions:
   contents: read
 jobs:
-  test:
+  test-config:
     env:
       WANT_STATUS: 103 # ExitCodeHigh
-    name: Test
+      WANT_CONFIG: testdata/lava.yaml
+    name: Test config
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -24,16 +25,22 @@ jobs:
         run: 'echo "Lava status: ${{ steps.lava.outputs.status }}"'
       - name: Print report
         run: 'cat "${{ steps.lava.outputs.report }}"'
+      - name: Report unexpected config file
+        if: ${{ !endsWith(steps.lava.outputs.config, env.WANT_CONFIG) }}
+        run: |
+          echo "::error::unexpected config file: got: ${{ steps.lava.outputs.config }}, want: ${{ env.WANT_CONFIG }}"
+          exit 1
       - name: Report unexpected status
         if: ${{ steps.lava.outputs.status != env.WANT_STATUS }}
         run: |
           echo "::error::unexpected status code: got: ${{ steps.lava.outputs.status }}, want: ${{ env.WANT_STATUS }}"
           exit 1
-  test-defaults:
+  test-default-yaml:
     env:
       WANT_MIN_STATUS: 100 # ExitCodeInfo
       WANT_MAX_STATUS: 104 # ExitCodeCritical
-    name: Test defaults
+      WANT_CONFIG: default.yaml
+    name: Test default.yaml
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -46,10 +53,44 @@ jobs:
         run: 'echo "Lava status: ${{ steps.lava.outputs.status }}"'
       - name: Print report
         run: 'cat "${{ steps.lava.outputs.report }}"'
+      - name: Report unexpected config file
+        if: ${{ !endsWith(steps.lava.outputs.config, env.WANT_CONFIG) }}
+        run: |
+          echo "::error::unexpected config file: got: ${{ steps.lava.outputs.config }}, want: ${{ env.WANT_CONFIG }}"
+          exit 1
       - name: Report unexpected status
         if: ${{ steps.lava.outputs.status < env.WANT_MIN_STATUS || steps.lava.outputs.status > env.WANT_MAX_STATUS }}
         run: |
           echo "::error::unexpected status code: got: ${{ steps.lava.outputs.status }}, want: [${{ env.WANT_MIN_STATUS }}, ${{ env.WANT_MAX_STATUS }}]"
+          exit 1
+  test-lava-yaml:
+    env:
+      WANT_STATUS: 103 # ExitCodeHigh
+      WANT_CONFIG: lava.yaml
+    name: Test lava.yaml
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Run Lava Action
+        id: lava
+        uses: ./
+        env:
+          TEST_WORKDIR: testdata
+        continue-on-error: true
+      - name: Print status
+        run: 'echo "Lava status: ${{ steps.lava.outputs.status }}"'
+      - name: Print report
+        run: 'cat "${{ steps.lava.outputs.report }}"'
+      - name: Report unexpected config file
+        if: ${{ !endsWith(steps.lava.outputs.config, env.WANT_CONFIG) }}
+        run: |
+          echo "::error::unexpected config file: got: ${{ steps.lava.outputs.config }}, want: ${{ env.WANT_CONFIG }}"
+          exit 1
+      - name: Report unexpected status
+        if: ${{ steps.lava.outputs.status != env.WANT_STATUS }}
+        run: |
+          echo "::error::unexpected status code: got: ${{ steps.lava.outputs.status }}, want: ${{ env.WANT_STATUS }}"
           exit 1
   test-release:
     env:
@@ -63,7 +104,7 @@ jobs:
         id: lava
         uses: ./
         with:
-          version: v0.2.0
+          version: v0.5.0
           config: testdata/lava.yaml
         continue-on-error: true
       - name: Print status
