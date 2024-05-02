@@ -1,7 +1,7 @@
 # Copyright 2023 Adevinta
 
 name: Lava
-description: Run Lava
+description: Run Lava.
 inputs:
   config:
     description: Path of the Lava configuration file.
@@ -10,14 +10,17 @@ inputs:
     default: latest
   forcecolor:
     description: Force colorized output.
-    default: true
+    default: "true"
 outputs:
   status:
-    description: Status code
+    description: Status code.
     value: ${{ steps.lava.outputs.status }}
   report:
-    description: Path of the Lava report
+    description: Path of the Lava report.
     value: ${{ steps.lava.outputs.report }}
+  config:
+    description: Path to the used Lava configuration file.
+    value: ${{ steps.lava.outputs.config }}
 runs:
   using: composite
   steps:
