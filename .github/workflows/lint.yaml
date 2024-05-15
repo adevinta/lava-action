@@ -1,0 +1,32 @@
+name: Lint
+
+on: [push, pull_request]
+
+jobs:
+  lint-node:
+    name: Lint nodejs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Code Linting
+        run: npm run lint
+
+  lint-bash:
+    name: Lint bash
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Code Linting
+        run: shellcheck run.bash

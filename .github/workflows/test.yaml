@@ -4,11 +4,13 @@ name: Test
 on: [push, pull_request]
 permissions:
   contents: read
+  pull-requests: write
 jobs:
   test-config:
     env:
       WANT_STATUS: 103 # ExitCodeHigh
       WANT_CONFIG: testdata/lava.yaml
+      WANT_METRICS: /configured-metrics.json
     name: Test config
     runs-on: ubuntu-latest
     steps:
@@ -20,6 +22,7 @@ jobs:
         with:
           version: latest
           config: testdata/lava.yaml
+          comment-pr: 'true'
         continue-on-error: true
       - name: Print status
         run: 'echo "Lava status: ${{ steps.lava.outputs.status }}"'
@@ -35,11 +38,45 @@ jobs:
         run: |
           echo "::error::unexpected status code: got: ${{ steps.lava.outputs.status }}, want: ${{ env.WANT_STATUS }}"
           exit 1
+      - name: PR comment generated
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.number
+            });
+
+            const comment = comments.find(comment =>
+                comment.body.includes(`action:lava-action job:${context.job}`)
+                && comment.body.includes(`High`));
+
+            if (!comment) {
+              core.setFailed('PR comment not generated');
+            }
+      - name: Report unexpected metrics file
+        run: |
+          if [[ "${{ steps.lava.outputs.metrics }}" != *"${{ env.WANT_METRICS }}"* ]]; then
+            echo "::error::unexpected status metrics output: got: ${{ steps.lava.outputs.metrics }}, want: ${{ env.WANT_METRICS }}"
+            exit 1
+          fi
+          if [ ! -f "${{ steps.lava.outputs.metrics }}" ]; then
+            echo "::error::metrics file not found"
+            exit 1
+          fi
+          if [[ "$(jq -r '.exit_code' "${{ steps.lava.outputs.metrics }}" )" != "${{ steps.lava.outputs.status }}" ]]; then
+            echo "::error::metrics wrong content"
+            exit 1
+          fi
+
   test-default-yaml:
     env:
       WANT_MIN_STATUS: 100 # ExitCodeInfo
       WANT_MAX_STATUS: 104 # ExitCodeCritical
       WANT_CONFIG: default.yaml
+      WANT_METRICS: metrics-injected
     name: Test default.yaml
     runs-on: ubuntu-latest
     steps:
@@ -63,6 +100,39 @@ jobs:
         run: |
           echo "::error::unexpected status code: got: ${{ steps.lava.outputs.status }}, want: [${{ env.WANT_MIN_STATUS }}, ${{ env.WANT_MAX_STATUS }}]"
           exit 1
+      - name: No PR comment generated
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.number
+            });
+
+            const comment = comments.find(comment =>
+                comment.body.includes(`action:lava-action job:${context.job}`)
+                && comment.body.includes(`High`));
+
+            if (comment) {
+              core.setFailed('PR comment should not be generated');
+            }
+      - name: Report unexpected metrics file
+        run: |
+          if [[ "${{ steps.lava.outputs.metrics }}" != *"${{ env.WANT_METRICS }}"* ]]; then
+            echo "::error::unexpected status metrics output: got: ${{ steps.lava.outputs.metrics }}, want: ${{ env.WANT_METRICS }}"
+            exit 1
+          fi
+          if [ ! -f "${{ steps.lava.outputs.metrics }}" ]; then
+            echo "::error::metrics file not found"
+            exit 1
+          fi
+          if [[ "$(jq -r '.exit_code' "${{ steps.lava.outputs.metrics }}" )" != "${{ steps.lava.outputs.status }}" ]]; then
+            echo "::error::metrics wrong content"
+            exit 1
+          fi
+
   test-lava-yaml:
     env:
       WANT_STATUS: 103 # ExitCodeHigh
