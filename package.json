@@ -1,0 +1,17 @@
+{
+  "name": "lava-action",
+  "version": "0.0.0",
+  "description": "This action runs Lava in your GitHub Actions workflows.",
+  "main": "report.js",
+  "scripts": {
+    "test": "echo \"error: no test specified\" && exit 1",
+    "lint": "eslint ."
+  },
+  "author": "Adevinta",
+  "license": "MIT",
+  "devDependencies": {
+    "@eslint/js": "^9.2.0",
+    "eslint": "^9.2.0",
+    "globals": "^15.2.0"
+  }
+}

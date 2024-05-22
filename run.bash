@@ -2,6 +2,7 @@
 
 GH_DOWNLOAD_URL_FMT='https://github.com/adevinta/lava/releases/download/%s/lava_linux_amd64.tar.gz'
 GH_DOWNLOAD_URL_LATEST='https://github.com/adevinta/lava/releases/latest/download/lava_linux_amd64.tar.gz'
+YQ_VERSION=${YQ_VERSION:-v4.44.1}
 
 install_lava() {
 	local version=$1
@@ -10,6 +11,7 @@ install_lava() {
 	if [[ $version == 'latest' ]]; then
 		url=$GH_DOWNLOAD_URL_LATEST
 	else
+		# shellcheck disable=SC2059
 		url=$(printf "${GH_DOWNLOAD_URL_FMT}" "${version}")
 	fi
 
@@ -63,6 +65,24 @@ if ! install_lava "${LAVA_VERSION}"; then
 	exit 1
 fi
 
+if ! which yq &> /dev/null; then
+	if ! (wget "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64.tar.gz" -O - | tar xz && sudo mv yq_linux_amd64 /usr/local/bin/yq) 2> /dev/null; then
+		echo 'error: could not install yq' >&2
+		exit 1
+	fi
+fi
+
+# This action needs the metrics, so if not set it is forced.
+metrics=$(yq '.report.metrics' "${config}")
+if [[ "$metrics" == "null" ]]; then
+	metrics=$(mktemp -t metrics-injected-XXXX)
+	original_config=$config
+	config=$(mktemp)
+	metrics=$metrics yq eval '.report.metrics = strenv(metrics)' "${original_config}" > "${config}"
+else
+	metrics=$(realpath "$metrics")
+fi
+
 # Run Lava.
 
 output=$(mktemp)
@@ -70,10 +90,16 @@ output=$(mktemp)
 lava scan -c "${config}" > "${output}"
 status=$?
 
+# Restore original config
+if [[ "$original_config" != "" ]]; then
+	config=$original_config
+fi
+
 {
 echo "status=${status}"
 echo "report=${output}"
 echo "config=${config}"
+echo "metrics=${metrics}"
 } > "${GITHUB_OUTPUT}"
 
 cat "${output}"

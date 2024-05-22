@@ -13,12 +13,12 @@ following content in your repository.
 ```yaml
 name: Lava
 on: [push, pull_request]
-permissions:
-  contents: read
 jobs:
   lava:
     name: Lava
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -58,6 +58,32 @@ or the [default.yaml] otherwhise.
 ```yaml
 - name: Run Lava Action
   uses: adevinta/lava-action@v0
+```
+
+### Disabling commenting pull requests
+
+The `comment-pr` input parameter specifies if the action generates a comment on
+the pull request with a summary of the findings.
+The `pull_request: write` permission is required.
+The default value is `false`.
+
+```yaml
+name: Lava
+on: [push, pull_request]
+jobs:
+  lava:
+    name: Lava
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull_request: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Run Lava Action
+        uses: adevinta/lava-action@v0
+        with:
+          comment-pr: "true"
 ```
 
 ## Contributing
