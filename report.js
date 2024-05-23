@@ -7,7 +7,7 @@ const fs=require('fs')
 function generateSummary(core, metrics) {
   var body = '### Lava scan results\n\n';
 
-  if (Object.keys(metrics.vulnerability_count).length === 0) {
+  if (!metrics.vulnerability_count || Object.keys(metrics.vulnerability_count).length === 0) {
     return body + `No vulnerabilities found! 🎉\n\n`;
   }
 
