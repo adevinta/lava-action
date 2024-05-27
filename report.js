@@ -2,7 +2,7 @@
 
 // This module generates summaries and comments pull requests based on the Lava results.
 
-const fs=require('fs')
+const fs = require('fs')
 
 function generateSummary(core, metrics) {
   var body = '### Lava scan results\n\n';
@@ -79,5 +79,15 @@ module.exports.postComment = async (github, context, core) => {
   // eslint-disable-next-line no-undef
   const metrics = JSON.parse(fs.readFileSync(process.env.METRICS, 'utf8'));
   const summary = generateSummary(core, metrics);
-  await comment(github, context, summary);
+  try {
+    await comment(github, context, summary);
+  } catch (e) {
+    console.log(e);
+    core.summary
+      .addHeading(':warning: Unable to create pull request comment', 4)
+      .addRaw('Error:', true).addQuote(e)
+      .addRaw('Remember to grant the required permissions to the job (or disable comment-pr option).', true)
+      .addCodeBlock('permissions:\n  pull_request: write', 'yaml')
+      .write();
+  }
 }
