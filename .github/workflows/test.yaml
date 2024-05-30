@@ -260,3 +260,38 @@ jobs:
             if (!comment) {
               core.setFailed('PR comment not generated');
             }
+
+  test-no-permissions:
+    permissions:
+      contents: read
+      pull-requests: read
+    env:
+      WANT_STATUS: 103 # ExitCodeHigh
+      WANT_OUTCOME: success
+    name: Test no pull-request permissions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Run Lava Action
+        id: lava
+        uses: ./
+        with:
+          version: latest
+          config: testdata/lava.yaml
+          comment-pr: 'true'
+        continue-on-error: true
+      - name: Print status
+        run: 'echo "Lava status: ${{ steps.lava.outputs.status }}"'
+      - name: Print report
+        run: 'cat "${{ steps.lava.outputs.report }}"'
+      - name: Report unexpected status
+        if: ${{ steps.lava.outputs.status != env.WANT_STATUS }}
+        run: |
+          echo "::error::unexpected status code: got: ${{ steps.lava.outputs.status }}, want: ${{ env.WANT_STATUS }}"
+          exit 1
+      - name: Report unexpected outcome
+        if: steps.lava.outcome == env.WANT_OUTCOME
+        run: |
+          echo "::error::unexpected outcome: got: ${{ steps.lava.outcome }}, want: ${{ env.WANT_OUTCOME }}"
+          exit 1
