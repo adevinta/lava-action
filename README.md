@@ -60,7 +60,7 @@ or the [default.yaml] otherwhise.
   uses: adevinta/lava-action@v0
 ```
 
-### Disabling commenting pull requests
+### Enabling commenting pull requests
 
 The `comment-pr` input parameter specifies if the action generates a comment on
 the pull request with a summary of the findings.
