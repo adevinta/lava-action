@@ -64,7 +64,7 @@ or the [default.yaml] otherwhise.
 
 The `comment-pr` input parameter specifies if the action generates a comment on
 the pull request with a summary of the findings.
-The `pull_request: write` permission is required.
+The `pull-requests: write` permission is required.
 The default value is `false`.
 
 ```yaml
@@ -76,7 +76,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull_request: write
+      pull-requests: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

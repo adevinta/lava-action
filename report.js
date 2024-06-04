@@ -87,7 +87,7 @@ module.exports.postComment = async (github, context, core) => {
       .addHeading(':warning: Unable to create pull request comment', 4)
       .addRaw('Error:', true).addQuote(e)
       .addRaw('Remember to grant the required permissions to the job (or disable comment-pr option).', true)
-      .addCodeBlock('permissions:\n  pull_request: write', 'yaml')
+      .addCodeBlock('permissions:\n  pull-requests: write', 'yaml')
       .write();
   }
 }
