@@ -1,33 +1,34 @@
 // Copyright 2024 Adevinta
 
-// This module generates summaries and comments pull requests based on the Lava results.
+// This module generates summaries and comments pull requests based on
+// the Lava results.
 
 const fs = require('fs')
 
-function generateSummary(core, metrics) {
+function generateSummary(core, fullreport) {
   var body = '### Lava scan results\n\n';
 
-  if (!metrics.vulnerability_count || Object.keys(metrics.vulnerability_count).length === 0) {
+  if (!fullreport.summary || !fullreport.summary.count || Object.keys(fullreport.summary.count).length === 0) {
     return body + `No vulnerabilities found! 🎉\n\n`;
   }
 
   body += `| Severity | Findings |\n`;
   body += `|---|---:|\n`;
 
-  if (metrics.vulnerability_count["critical"] > 0) {
-    body += `| 🟣 Critical | ${metrics.vulnerability_count["critical"]} |\n`;
+  if (fullreport.summary.count.critical && fullreport.summary.count.critical > 0) {
+    body += `| 🟣 Critical | ${fullreport.summary.count.critical} |\n`;
   }
-  if (metrics.vulnerability_count["high"] > 0) {
-    body += `| 🔴 High | ${metrics.vulnerability_count["high"]} |\n`;
+  if (fullreport.summary.count.high && fullreport.summary.count.high > 0) {
+    body += `| 🔴 High | ${fullreport.summary.count.high} |\n`;
   }
-  if (metrics.vulnerability_count["medium"] > 0) {
-    body += `| 🟠 Medium | ${metrics.vulnerability_count["medium"]} |\n`;
+  if (fullreport.summary.count.medium && fullreport.summary.count.medium > 0) {
+    body += `| 🟠 Medium | ${fullreport.summary.count.medium} |\n`;
   }
-  if (metrics.vulnerability_count["low"] > 0) {
-    body += `| 🟡 Low | ${metrics.vulnerability_count["low"]} |\n`;
+  if (fullreport.summary.count.low && fullreport.summary.count.low > 0) {
+    body += `| 🟡 Low | ${fullreport.summary.count.low} |\n`;
   }
-  if (metrics.vulnerability_count["info"] > 0) {
-    body += `| 🔵 Info | ${metrics.vulnerability_count["info"]} |\n`;
+  if (fullreport.summary.count.info && fullreport.summary.count.info > 0) {
+    body += `| 🔵 Info | ${fullreport.summary.count.info} |\n`;
   }
   return body;
 }
@@ -66,19 +67,21 @@ async function comment(github, context, summary) {
   })
 }
 
-// writeSummary writes a step job summary based on the metrics file.
+// writeSummary writes a step job summary based on the full report
+// file.
 module.exports.writeSummary = async (core) => {
   // eslint-disable-next-line no-undef
-  const metrics = JSON.parse(fs.readFileSync(process.env.METRICS, 'utf8'));
-  const summary = generateSummary(core, metrics);
+  const fullreport = JSON.parse(fs.readFileSync(process.env.FULLREPORT, 'utf8'));
+  const summary = generateSummary(core, fullreport);
   core.summary.addRaw(summary).write();
 }
 
-// postComment creates or updates a comment in the pull request based on the metrics file.
+// postComment creates or updates a comment in the pull request based
+// on the full report file.
 module.exports.postComment = async (github, context, core) => {
   // eslint-disable-next-line no-undef
-  const metrics = JSON.parse(fs.readFileSync(process.env.METRICS, 'utf8'));
-  const summary = generateSummary(core, metrics);
+  const fullreport = JSON.parse(fs.readFileSync(process.env.FULLREPORT, 'utf8'));
+  const summary = generateSummary(core, fullreport);
   try {
     await comment(github, context, summary);
   } catch (e) {

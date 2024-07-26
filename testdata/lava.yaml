@@ -6,4 +6,3 @@ targets:
     type: GitRepository
 report:
   severity: high
-  metrics: ./configured-metrics.json

@@ -10,7 +10,6 @@ jobs:
     env:
       WANT_STATUS: 103 # ExitCodeHigh
       WANT_CONFIG: testdata/lava.yaml
-      WANT_METRICS: /configured-metrics.json
     name: Test config
     runs-on: ubuntu-latest
     steps:
@@ -58,16 +57,22 @@ jobs:
             }
       - name: Report unexpected metrics file
         run: |
-          if [[ "${{ steps.lava.outputs.metrics }}" != *"${{ env.WANT_METRICS }}"* ]]; then
-            echo "::error::unexpected status metrics output: got: ${{ steps.lava.outputs.metrics }}, want: ${{ env.WANT_METRICS }}"
-            exit 1
-          fi
           if [ ! -f "${{ steps.lava.outputs.metrics }}" ]; then
             echo "::error::metrics file not found"
             exit 1
           fi
-          if [[ "$(jq -r '.exit_code' "${{ steps.lava.outputs.metrics }}" )" != "${{ steps.lava.outputs.status }}" ]]; then
-            echo "::error::metrics wrong content"
+          if [[ $(jq -r '.exit_code' "${{ steps.lava.outputs.metrics }}") != ${{ steps.lava.outputs.status }} ]]; then
+            echo "::error::malformed metrics file"
+            exit 1
+          fi
+      - name: Report unexpected full report file
+        run: |
+          if [ ! -f "${{ steps.lava.outputs.fullreport }}" ]; then
+            echo "::error::full report file not found"
+            exit 1
+          fi
+          if [[ $(jq -r '.vulnerabilities|length' "${{ steps.lava.outputs.fullreport }}") == 0 ]]; then
+            echo "::error::malformed full report"
             exit 1
           fi
 
@@ -76,7 +81,6 @@ jobs:
       WANT_MIN_STATUS: 100 # ExitCodeInfo
       WANT_MAX_STATUS: 104 # ExitCodeCritical
       WANT_CONFIG: default.yaml
-      WANT_METRICS: metrics-injected
     name: Test default.yaml
     runs-on: ubuntu-latest
     steps:
@@ -120,16 +124,22 @@ jobs:
             }
       - name: Report unexpected metrics file
         run: |
-          if [[ "${{ steps.lava.outputs.metrics }}" != *"${{ env.WANT_METRICS }}"* ]]; then
-            echo "::error::unexpected status metrics output: got: ${{ steps.lava.outputs.metrics }}, want: ${{ env.WANT_METRICS }}"
-            exit 1
-          fi
           if [ ! -f "${{ steps.lava.outputs.metrics }}" ]; then
             echo "::error::metrics file not found"
             exit 1
           fi
-          if [[ "$(jq -r '.exit_code' "${{ steps.lava.outputs.metrics }}" )" != "${{ steps.lava.outputs.status }}" ]]; then
-            echo "::error::metrics wrong content"
+          if [[ $(jq -r '.exit_code' "${{ steps.lava.outputs.metrics }}") != ${{ steps.lava.outputs.status }} ]]; then
+            echo "::error::malformed metrics file"
+            exit 1
+          fi
+      - name: Report unexpected full report file
+        run: |
+          if [ ! -f "${{ steps.lava.outputs.fullreport }}" ]; then
+            echo "::error::full report file not found"
+            exit 1
+          fi
+          if [[ $(jq -r '.vulnerabilities|length' "${{ steps.lava.outputs.fullreport }}") == 0 ]]; then
+            echo "::error::malformed full report"
             exit 1
           fi
 

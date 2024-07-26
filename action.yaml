@@ -25,8 +25,11 @@ outputs:
     description: Path to the used Lava configuration file.
     value: ${{ steps.lava.outputs.config }}
   metrics:
-    description: Path to the metrics generated file.
+    description: Path to the generated metrics file.
     value: ${{ steps.lava.outputs.metrics }}
+  fullreport:
+    description: Path to the generated full report file.
+    value: ${{ steps.lava.outputs.fullreport }}
 runs:
   using: composite
   steps:
@@ -42,7 +45,7 @@ runs:
       uses: actions/github-script@v7
       if: ${{ !cancelled() }}
       env:
-        METRICS: ${{ steps.lava.outputs.metrics }}
+        FULLREPORT: ${{ steps.lava.outputs.fullreport }}
         COMMENT_PR: ${{ inputs.comment-pr }}
       with:
         script: |
@@ -52,7 +55,7 @@ runs:
       uses: actions/github-script@v7
       if: ${{ !cancelled() && github.event_name=='pull_request' && inputs.comment-pr=='true' }}
       env:
-        METRICS: ${{ steps.lava.outputs.metrics }}
+        FULLREPORT: ${{ steps.lava.outputs.fullreport }}
       with:
         script: |
           const report = require(`${process.env.GITHUB_ACTION_PATH}/report.js`);
