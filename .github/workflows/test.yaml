@@ -15,11 +15,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
       - name: Run Lava Action
         id: lava
         uses: ./
         with:
-          version: latest
+          version: output
           config: testdata/lava.yaml
           comment-pr: 'true'
         continue-on-error: true
@@ -86,9 +90,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
       - name: Run Lava Action
         id: lava
         uses: ./
+        with:
+          version: output
         continue-on-error: true
       - name: Print status
         run: 'echo "Lava status: ${{ steps.lava.outputs.status }}"'
@@ -152,12 +162,17 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
       - name: Run Lava Action
         id: lava
         uses: ./
         env:
           TEST_WORKDIR: testdata
         with:
+          version: output
           comment-pr: 'true'
         continue-on-error: true
       - name: Print status
@@ -174,6 +189,7 @@ jobs:
         run: |
           echo "::error::unexpected status code: got: ${{ steps.lava.outputs.status }}, want: ${{ env.WANT_STATUS }}"
           exit 1
+
   test-release:
     env:
       WANT_STATUS: 103 # ExitCodeHigh
@@ -182,11 +198,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
       - name: Run Lava Action
         id: lava
         uses: ./
         with:
-          version: v0.5.0
+          version: output
           config: testdata/lava.yaml
         continue-on-error: true
       - name: Print status
@@ -198,6 +218,7 @@ jobs:
         run: |
           echo "::error::unexpected status code: got: ${{ steps.lava.outputs.status }}, want: ${{ env.WANT_STATUS }}"
           exit 1
+
   test-branch:
     env:
       WANT_STATUS: 103 # ExitCodeHigh
@@ -214,7 +235,7 @@ jobs:
         id: lava
         uses: ./
         with:
-          version: main
+          version: output
           config: testdata/lava.yaml
         continue-on-error: true
       - name: Print status
@@ -235,10 +256,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
       - name: Run Lava Action
         id: lava
         uses: ./
         with:
+          version: output
           comment-pr: 'true'
         env:
           TEST_WORKDIR: .github
@@ -283,11 +309,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
       - name: Run Lava Action
         id: lava
         uses: ./
         with:
-          version: latest
+          version: output
           config: testdata/lava.yaml
           comment-pr: 'true'
         continue-on-error: true
