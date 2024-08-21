@@ -1,14 +1,14 @@
 # Lava Action
 
-This action runs [Lava][lava] in your GitHub Actions workflows.
+This action runs [Lava] in your GitHub Actions workflows.
 
 Lava is an open source vulnerability scanner that makes it easy to run
 security checks in your local and CI/CD environments.
 
 ## Usage
 
-Create a file with the name `.github/workflows/lava.yaml` and the
-following content in your repository.
+Create a new workflow with the following content in your GitHub
+repository.
 
 ```yaml
 name: Lava
@@ -22,18 +22,32 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Run Lava Action
+      - name: Run Lava
         uses: adevinta/lava-action@v0
 ```
+
+You can also add the following steps to any existing job:
+
+```yaml
+steps:
+  - name: Checkout repository
+    uses: actions/checkout@v4
+  - name: Run Lava
+    uses: adevinta/lava-action@v0
+```
+
+Refer to the [GitHub Actions documentation] for more information about
+GitHub Actions workflows.
 
 ## Settings
 
 ### Pinning a Lava version
 
 The `version` input parameter specifies the version of Lava to use.
+The default value is `latest`.
 
 ```yaml
-- name: Run Lava Action
+- name: Run Lava
   uses: adevinta/lava-action@v0
   with:
     version: latest
@@ -46,24 +60,25 @@ file passed to Lava.
 The path is relative to the root of the repository.
 
 ```yaml
-- name: Run Lava Action
+- name: Run Lava
   uses: adevinta/lava-action@v0
   with:
     config: lava.yaml
 ```
 
-If the parameter is missing the action will use an existing `lava.yaml` file,
-or the [default.yaml] otherwhise.
+If the `config` input parameter is not specified, the action will try
+to find a `lava.yaml` file in the root of the repository.
+If it does not exist, [default.yaml] will be used.
 
 ```yaml
-- name: Run Lava Action
+- name: Run Lava
   uses: adevinta/lava-action@v0
 ```
 
-### Enabling commenting pull requests
+### Enabling pull request comments
 
-The `comment-pr` input parameter specifies if the action generates a comment on
-the pull request with a summary of the findings.
+The `comment-pr` input parameter specifies whether the action should
+post a comment on the pull request with a summary of the findings.
 The `pull-requests: write` permission is required.
 The default value is `false`.
 
@@ -80,7 +95,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Run Lava Action
+      - name: Run Lava
         uses: adevinta/lava-action@v0
         with:
           comment-pr: "true"
@@ -91,10 +106,10 @@ jobs:
 **This project is in an early stage, we are not accepting external
 contributions yet.**
 
-To contribute, please read the [contribution
-guidelines][contributing].
+To contribute, please read the [contribution guidelines].
 
 
-[lava]: https://github.com/adevinta/lava
-[contributing]: /CONTRIBUTING.md
+[Lava]: https://github.com/adevinta/lava
+[GitHub Actions documentation]: https://docs.github.com/en/actions
 [default.yaml]: /default.yaml
+[contribution guidelines]: /CONTRIBUTING.md
